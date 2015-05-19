@@ -1129,6 +1129,11 @@
         }
       }
     },
+    "node-uuid": {
+      "version": "1.4.3",
+      "from": "node-uuid@",
+      "resolved": "https://registry.npmjs.org/node-uuid/-/node-uuid-1.4.3.tgz"
+    },
     "ramda": {
       "version": "0.13.0",
       "from": "ramda@^0.13.0",

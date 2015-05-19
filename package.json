@@ -45,6 +45,7 @@
     "jsonwebtoken": "^5.0.1",
     "ldapjs": "^0.7.1",
     "morgan": "^1.5.1",
+    "node-uuid": "^1.4.3",
     "ramda": "^0.13.0",
     "winston": "^0.8.3"
   }
