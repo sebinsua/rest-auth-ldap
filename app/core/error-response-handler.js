@@ -1,7 +1,8 @@
 'use strict';
 
 var errorCodeToStatusCode = {
-
+    'UNAUTHORIZED': 401,
+    'FORBIDDEN': 403
 };
 
 var generateErrorResponder = function (req, res) {

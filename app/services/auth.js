@@ -1,26 +1,26 @@
 'use strict';
 
-var Promise = require('bluebird'),
-    debug = require('debug')('rest-auth-ldap:services:auth');
+// var Promise = require('bluebird');
 
-var generateErrorResponder = require('../core/error-response-handler');
+var LdapService = require('./ldap');
 
-function render(res) {
-    return function (authResult) {
-        debug(authResult);
-        return res.json({
-            success: true,
-            authToken: authResult
-        });
-    };
-}
+var config = require('../../config');
+
+// var debug = require('debug')('rest-auth-ldap:services:auth');
 
 function AuthService() {}
 
-AuthService.prototype.getAuthToken = function (req, res, next) {
-    var getAuthToken = Promise.resolve({});
-    getAuthToken.then(render(res))
-                .catch(generateErrorResponder(req, res, next));
+AuthService.prototype.getAuthToken = function (username, password) {
+  var ldapService = new LdapService({
+    server: {
+      url: config.LDAP_SERVER_URL,
+      timeout: 5 * 1000
+    }
+  });
+
+  var authenticateUser = ldapService.authenticate(username, password);
+
+  return authenticateUser;
 };
 
 module.exports = new AuthService();
