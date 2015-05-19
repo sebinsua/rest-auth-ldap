@@ -1,0 +1,17 @@
+{
+    "env": {
+        "node": true,
+        "mocha": true
+    },
+    "globals": {
+        "xit": true,
+        "xdescribe": true
+    },
+    "rules": {
+        "quotes": [1, "single"],
+        "no-mixed-requires": false,
+        "new-cap": false,
+        "no-wrap-func": false,
+        "no-unused-expressions": false
+    }
+}

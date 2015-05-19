@@ -1,0 +1,13 @@
+{
+  "env": {
+    "node": true
+  },
+  "globals": {
+    "Promise": true
+  },
+  "rules": {
+    "quotes": [1, "single"],
+    "no-mixed-requires": false,
+    "new-cap": false
+  }
+}

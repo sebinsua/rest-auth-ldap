@@ -1,0 +1,5 @@
+{
+  "SERVICE_PORT": 3002,
+  "SERVICE_APP_LOG": "./app.log",
+  "SERVICE_ERROR_LOG": "./error.log"
+}

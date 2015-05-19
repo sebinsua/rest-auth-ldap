@@ -1,0 +1,51 @@
+{
+  "name": "rest-auth-ldap",
+  "version": "0.0.0",
+  "description": "",
+  "author": "Seb Insua <me@sebinsua.com>",
+  "license": "Commercial",
+  "private": true,
+  "main": "app.js",
+  "scripts": {
+    "dev": "./node_modules/.bin/gulp watch",
+    "start": "node app",
+    "test": "npm run lint && npm run unit && npm run audit",
+    "lint": "./node_modules/.bin/eslint .",
+    "unit": "./node_modules/.bin/mocha --recursive test/unit/**/* --require test/unit/helper",
+    "audit": "./node_modules/.bin/nsp audit-shrinkwrap"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@git.commons.hmpo.net:hmpo-lsr/rest-auth-ldap.git"
+  },
+  "engines": {
+    "node": "0.10.x"
+  },
+  "devDependencies": {
+    "chai": "^1.10.0",
+    "chai-as-promised": "^4.1.1",
+    "eslint": "^0.12.0",
+    "gulp": "^3.8.11",
+    "gulp-eslint": "^0.6.0",
+    "gulp-task-listing": "^1.0.0",
+    "mocha": "^2.1.0",
+    "nsp": "^1.0.1",
+    "sinon": "^1.12.2",
+    "sinon-chai": "^2.6.0"
+  },
+  "dependencies": {
+    "bluebird": "^2.8.2",
+    "body-parser": "^1.10.2",
+    "compression": "^1.4.0",
+    "cors": "^2.6.0",
+    "debug": "^2.1.1",
+    "express": "^4.11.1",
+    "express-healthcheck": "0.0.2",
+    "gulp-nodemon": "^2.0.2",
+    "jsonwebtoken": "^5.0.1",
+    "ldapjs": "^0.7.1",
+    "morgan": "^1.5.1",
+    "ramda": "^0.13.0",
+    "winston": "^0.8.3"
+  }
+}
