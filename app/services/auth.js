@@ -117,7 +117,8 @@ AuthService.prototype.validate = function (authToken, applicationId) {
   var verify = Promise.promisify(jwt.verify.bind(jwt));
 
   return verify(authToken, secret).then(function (payload) {
-    if (applicationId !== payload.applicationId) {
+    var isForApplication = payload.applicationId && applicationId !== payload.applicationId && payload.applicationId !== 'all';
+    if (isForApplication) {
       throw getErrorWithCode('Unauthorised access: for application (' + applicationId + ').');
     }
 
