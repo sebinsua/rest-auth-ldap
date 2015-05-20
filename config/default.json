@@ -3,5 +3,7 @@
   "SERVICE_APP_LOG": "./app.log",
   "SERVICE_ERROR_LOG": "./error.log",
 
-  "LDAP_SERVER_URL": "ldap://ldap.pex.hmpo.net"
+  "LDAP_SERVER_URL": "ldaps://ldap.commons.hmpo.net",
+
+  "SHARED_SECRET": "hmpo-lsr-server-to-server-secret"
 }

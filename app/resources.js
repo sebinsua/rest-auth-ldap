@@ -12,7 +12,7 @@ var debug = require('debug')('rest-auth-ldap:resources');
 
 var router = express.Router();
 
-var getAuthToken = function (req, res, next) {
+var getAuthResponse = function (req, res, next) {
   function render(response) {
       return function (authToken) {
           debug(authToken);
@@ -23,13 +23,13 @@ var getAuthToken = function (req, res, next) {
       };
   }
 
-  return authService.getAuthToken(req.body.username, req.body.password)
+  return authService.authenticate(req.body.username, req.body.password)
                     .then(render(res))
                     .catch(generateErrorResponder(req, res, next));
 };
 
 router.route('/auth')
       .all(methodNotFound)
-      .post(getAuthToken);
+      .post(getAuthResponse);
 
 module.exports = router;

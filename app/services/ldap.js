@@ -68,6 +68,7 @@ LdapService.prototype.authenticate = function (username, password) {
     // Create the client on every auth attempt the LDAP server can close the connection
     var client = ldap.createClient(self.options.server);
 
+    /*
     if (self.options.authMode === 1) {
       var base = self.options.base;
       if (typeof base !== 'string') {
@@ -75,7 +76,11 @@ LdapService.prototype.authenticate = function (username, password) {
       }
       username = self.options.uidTag + '=' + username + ',' + base;
     }
+    */
 
+    // TODO: username used to the be the first argument, and password the second
+    console.log(username);
+    console.log(password);
     client.bind(username, password, function (err) {
       if (err) {
         debug('(EE) [ldapjs] LDAP error:', err.stack);
@@ -108,9 +113,9 @@ LdapService.prototype.authenticate = function (username, password) {
 
         // Create copy of the search object so we don't overwrite it
         var search = Object.create(self.options.search);
-
         // Replace placeholder name
         search.filter = search.filter.replace(/\$uid\$/, name);
+        console.log(search);
         client.search(dn, search, function (err, res) {
           if (err) {
             debug('(EE) [ldapjs] LDAP error:', err.stack);
