@@ -2,11 +2,13 @@
 
 var express = require('express');
 
-var authService = require('./services/auth');
+var AuthService = require('./services/auth');
 
 var methodNotFound = require('../lib/middlewares/method-not-found');
 
 var generateErrorResponder = require('./core/error-response-handler');
+
+var config = require('../config');
 
 var debug = require('debug')('rest-auth-ldap:resources');
 
@@ -14,16 +16,17 @@ var router = express.Router();
 
 var getAuthResponse = function (req, res, next) {
   function render(response) {
-      return function (authToken) {
-          debug(authToken);
+      return function (data) {
+          debug(data);
           return response.json({
               success: true,
-              authToken: authToken
+              data: data
           });
       };
   }
 
-  return authService.authenticate(req.body.username, req.body.password)
+  var authService = new AuthService(config.ROLES);
+  return authService.authenticate(req.body.username, req.body.password, req.body.applicationId)
                     .then(render(res))
                     .catch(generateErrorResponder(req, res, next));
 };

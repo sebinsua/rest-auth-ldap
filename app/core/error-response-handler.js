@@ -2,7 +2,8 @@
 
 var errorCodeToStatusCode = {
     'UNAUTHORIZED': 401,
-    'FORBIDDEN': 403
+    'FORBIDDEN': 403,
+    'NETWORK_ERROR': 500
 };
 
 var generateErrorResponder = function (req, res) {

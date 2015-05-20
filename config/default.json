@@ -4,6 +4,14 @@
   "SERVICE_ERROR_LOG": "./error.log",
 
   "LDAP_SERVER_URL": "ldaps://ldap.commons.hmpo.net",
+  "LDAP_CERTIFICATE_PATH": "./cert/ldap.commons.hmpo.net.pem",
+  "LDAP_BASE": "ou=Services,dc=hmpo,dc=net",
+  "LDAP_UID_TAG": "cn",
+  "LDAP_TIMEOUT": 15000,
 
-  "SHARED_SECRET": "hmpo-lsr-server-to-server-secret"
+  "JWT_EXPIRY_MINUTES": 1440,
+  "JWT_AUDIENCE": "hmpo-lsr",
+  "JWT_ISSUER": "hmpo-auth-ldap",
+
+  "SHARED_SECRET": "hmpo-lsr:server-to-server-secret"
 }

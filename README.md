@@ -30,7 +30,18 @@ $ npm start;
 Endpoints
 ---------
 
-*TODO*
+**Authentication**
+
+```
+POST /auth
+{
+  "username": "username",
+  "password": "password",
+  "applicationId": "hmpo-lsr:frontend-examiner-psn"
+}
+```
+
+Should respond with 200, 401, 403 or 500 depending on the request given and the configuration of the service.
 
 Testing
 -------

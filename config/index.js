@@ -13,6 +13,7 @@ var CONFIG_PATH = '/etc/hmpo/rest-reporter-psn/config.json',
 
 var config = R.mergeAll([defaultConfig, instanceConfig, envConfig]);
 
-config.APP_ROOT = global.__root || path.resolve(__dirname, '../');
+config.APP_ROOT = path.resolve(__dirname, '../');
+config.ROLES = require('./object-classes-to-roles');
 
 module.exports = config;

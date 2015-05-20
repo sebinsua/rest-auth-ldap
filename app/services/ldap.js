@@ -7,11 +7,21 @@ var ldap = require('ldapjs');
 
 var debug = require('debug')('rest-auth-ldap:services:ldap');
 
-function getErrorWithCode(message, code) {
-  var error = new Error(message);
-  error.code = code || 'UNAUTHORIZED';
-  return error;
-}
+var getErrorWithCode = require('../core/get-error');
+
+var fakeBunyanLogger = {
+  child: function () {
+    return fakeBunyanLogger;
+  },
+  debug: function (/* arguments */) {
+      if (arguments.length === 0) return true;
+      debug.apply(debug, arguments);
+  },
+  trace: function (/* arguments */) {
+      if (arguments.length === 0) return true;
+      debug.apply(debug, arguments);
+  }
+};
 
 /*
  * We authenticate requests by delegating to the given ldap server using the openldap protocol.
@@ -35,7 +45,8 @@ function LdapService (options) {
   options = options || {};
   var defaultOptions = {
     server: {
-      url: ''
+      url: '',
+      log: fakeBunyanLogger,
     },
     base: '',
     search: {
@@ -47,6 +58,7 @@ function LdapService (options) {
   };
 
   this.options = R.merge(defaultOptions, options);
+  this.options.server = R.merge(defaultOptions.server, options.server);
 }
 
 /**
@@ -62,44 +74,48 @@ LdapService.prototype.authenticate = function (username, password) {
 
   return new Promise(function (resolve, reject) {
     if (!username || !password) {
-      return reject(getErrorWithCode('Unauthorised access attempt', 'UNAUTHORIZED'));
+      return reject(getErrorWithCode('Unauthorised access', 'UNAUTHORIZED'));
     }
 
     // Create the client on every auth attempt the LDAP server can close the connection
     var client = ldap.createClient(self.options.server);
 
-    /*
+    var bindDn = '';
     if (self.options.authMode === 1) {
       var base = self.options.base;
       if (typeof base !== 'string') {
         base = base.join(',');
       }
-      username = self.options.uidTag + '=' + username + ',' + base;
+      bindDn = self.options.uidTag + '=' + username + ',' + base;
     }
-    */
 
-    // TODO: username used to the be the first argument, and password the second
-    console.log(username);
-    console.log(password);
-    client.bind(username, password, function (err) {
+    client.bind(bindDn, password, function (err) {
       if (err) {
         debug('(EE) [ldapjs] LDAP error:', err.stack);
-        return reject(getErrorWithCode('Forbidden access attempt', 'FORBIDDEN'));
+        var errMessage, errCode;
+        if (err.code === 49) {
+          errMessage = 'Unauthorised access: ' + err.message;
+          errCode = 'UNAUTHORIZED';
+        } else {
+          errMessage = 'Connection error: ' + err.message;
+          errCode = 'NETWORK_ERROR';
+        }
+        return reject(getErrorWithCode(errMessage, errCode));
       }
 
       if (self.options.authOnly) {
         debug('(II) [ldapjs] auth success:', username);
-        resolve({
-          uid: username
-        });
+        var authOnlyResult = {};
+        authOnlyResult[self.options.uidTag] = username;
+        resolve(authOnlyResult);
       } else {
-        var dn = username;
+        var dn = bindDn;
         if (self.options.authMode !== 1) {
           // Add the dc from the username if not already in the configuration
-          if(typeof self.options.base !== 'string'){
+          if (typeof self.options.base !== 'string'){
             var nameSplit = username.split('\\');
-            var name = nameSplit[1];
             var dc = 'dc=' + nameSplit[0].toLowerCase();
+            username = nameSplit[1];
 
             dn = self.options.base.slice();
             if (self.options.base.indexOf(dc) === -1) {
@@ -114,33 +130,30 @@ LdapService.prototype.authenticate = function (username, password) {
         // Create copy of the search object so we don't overwrite it
         var search = Object.create(self.options.search);
         // Replace placeholder name
-        search.filter = search.filter.replace(/\$uid\$/, name);
-        console.log(search);
+        search.filter = search.filter.replace('$' + self.options.uidTag, username);
+
         client.search(dn, search, function (err, res) {
           if (err) {
             debug('(EE) [ldapjs] LDAP error:', err.stack);
-            return reject(getErrorWithCode('Forbidden access attempt', 'FORBIDDEN'));
+            return reject(getErrorWithCode('Unauthorised access: ' + err.message, 'UNAUTHORIZED'));
           }
 
           res.on('searchEntry', function (entry) {
             var profile = entry.object;
-
-            // There used to be some verification here, but I removed it.
             return resolve(profile);
           });
 
           res.on('error', function (err) {
             debug('(EE) [ldapjs] Network error:', err.stack);
-            return reject(getErrorWithCode(err.message, 'UNAUTHORIZED'));
+            return reject(getErrorWithCode(err.message, 'NETWORK_ERROR'));
           });
 
           res.on('end', function (result) {
             if (result.status !== 0) {
               debug('(EE) [ldapjs] Result not OK:', result);
-              return reject(getErrorWithCode('Unauthorised access attempt with status: ' + result.status, 'UNAUTHORIZED'));
+              return reject(getErrorWithCode('Unauthorised access: ' + result.status, 'UNAUTHORIZED'));
             }
           });
-
         });
       }
     });
