@@ -1,5 +1,6 @@
 'use strict';
 
+var Promise = require('bluebird');
 var R = require('ramda');
 
 var LdapService = require('./ldap');
@@ -70,9 +71,10 @@ AuthService.prototype.authenticate = function (username, password, applicationId
       var isApplicationLoginNotAllowed = authenticationResponse.roles.indexOf(applicationLogin) === -1;
       var isAllApplicationLoginNotAllowed = authenticationResponse.roles.indexOf(allApplicationLogin) === -1
       if (isApplicationLoginNotAllowed && isAllApplicationLoginNotAllowed) {
-        throw getErrorWithCode('Unauthorised access: for this application.');
+        throw getErrorWithCode('Unauthorised access: for application (' + applicationId + ').');
       }
 
+      authenticationResponse.applicationId = applicationId;
       return authenticationResponse;
     };
   };
@@ -107,6 +109,25 @@ AuthService.prototype.authenticate = function (username, password, applicationId
          then(assignRolesBasedOnObjectClass(objectClassToRoles)).
          then(checkRolesForLoginRights(applicationId)).
          then(signAsTrusty);
+};
+
+AuthService.prototype.validate = function (authToken, applicationId) {
+  var secret = config.SHARED_SECRET;
+
+  var verify = Promise.promisify(jwt.verify.bind(jwt));
+
+  return verify(authToken, secret).then(function (payload) {
+    if (applicationId !== payload.applicationId) {
+      throw getErrorWithCode('Unauthorised access: for application (' + applicationId + ').');
+    }
+
+    return {
+      username: payload.account.cn,
+      roles: payload.roles
+    };
+  }).catch(function (err) {
+    throw getErrorWithCode('Unauthorised access: ' + err.message, 'UNAUTHORIZED');
+  });
 };
 
 module.exports = AuthService;

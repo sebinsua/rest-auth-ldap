@@ -14,7 +14,7 @@ var debug = require('debug')('rest-auth-ldap:resources');
 
 var router = express.Router();
 
-var getAuthResponse = function (req, res, next) {
+var getAuthToken = function (req, res, next) {
   function render(response) {
       return function (data) {
           debug(data);
@@ -31,8 +31,29 @@ var getAuthResponse = function (req, res, next) {
                     .catch(generateErrorResponder(req, res, next));
 };
 
+var validateAuthToken = function (req, res, next) {
+  function render(response) {
+      return function (data) {
+          debug(data);
+          return response.json({
+              success: true,
+              data: data
+          });
+      };
+  }
+
+  var authService = new AuthService(config.ROLES);
+  return authService.validate(req.body.authToken, req.body.applicationId)
+                    .then(render(res))
+                    .catch(generateErrorResponder(req, res, next));
+};
+
 router.route('/auth')
       .all(methodNotFound)
-      .post(getAuthResponse);
+      .post(getAuthToken);
+
+router.route('/validate-auth')
+      .all(methodNotFound)
+      .post(validateAuthToken)
 
 module.exports = router;
