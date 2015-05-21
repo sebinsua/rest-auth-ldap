@@ -84,7 +84,7 @@ AuthService.prototype.authenticate = function (username, password, applicationId
     //       See: http://stackoverflow.com/questions/5244129/use-rsa-private-key-to-generate-public-key
     //       If so, check to see how webpack can support crypto. Perhaps use browserify-crypto.
 
-    var secret = config.SHARED_SECRET;
+    var secret = config.JWT_SHARED_SECRET;
 
     var payload = authenticationResponse;
     var authToken = jwt.sign(payload, secret, {
@@ -112,7 +112,7 @@ AuthService.prototype.authenticate = function (username, password, applicationId
 };
 
 AuthService.prototype.validate = function (authToken, applicationId) {
-  var secret = config.SHARED_SECRET;
+  var secret = config.JWT_SHARED_SECRET;
 
   var verify = Promise.promisify(jwt.verify.bind(jwt));
 
