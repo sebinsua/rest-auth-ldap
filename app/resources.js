@@ -54,6 +54,6 @@ router.route('/auth')
 
 router.route('/validate-auth')
       .all(methodNotFound)
-      .post(validateAuthToken)
+      .post(validateAuthToken);
 
 module.exports = router;

@@ -15,7 +15,7 @@ var path = require('path');
 
 var certificate;
 if (config.LDAP_CERTIFICATE_PATH) {
-  certificate = fs.readFileSync(path.resolve(__dirname + '/../../', config.LDAP_CERTIFICATE_PATH));
+  certificate = fs.readFileSync(path.resolve(__dirname, '/../../', config.LDAP_CERTIFICATE_PATH));
 }
 
 var ldapUidTag = config.LDAP_UID_TAG || 'cn';
@@ -25,7 +25,7 @@ function AuthService (objectClassToRoles) {
 }
 
 AuthService.prototype.authenticate = function (username, password, applicationId) {
-  var authenticateUserWithLdap = function authenticateUserWithLdap (username, password) {
+  var authenticateUserWithLdap = function authenticateUserWithLdap (_username, _password) {
     var ldapService = new LdapService({
       server: {
         url: config.LDAP_SERVER_URL,
@@ -43,16 +43,15 @@ AuthService.prototype.authenticate = function (username, password, applicationId
       }
     });
 
-    return ldapService.authenticate(username, password);
+    return ldapService.authenticate(_username, _password);
   };
 
-  var assignRolesBasedOnObjectClass = function assignRolesBasedOnObjectClass(objectClassToRoles) {
+  var assignRolesBasedOnObjectClass = function assignRolesBasedOnObjectClass(_objectClassToRoles) {
     var pickKeys = R.pick([ldapUidTag, 'dn', 'objectClass']);
-    var toRoles = R.pipe(R.map(R.flip(R.prop)(objectClassToRoles)), R.filter(R.identity), R.flatten);
+    var toRoles = R.pipe(R.map(R.flip(R.prop)(_objectClassToRoles)), R.filter(R.identity), R.flatten);
 
     return function assignRoles (ldapAccount) {
-      var cn = ldapAccount[ldapUidTag];
-      var objectClasses = ldapAccount['objectClass'];
+      var objectClasses = ldapAccount.objectClass;
 
       var authenticationResponse = {
         account: pickKeys(ldapAccount),
@@ -63,18 +62,18 @@ AuthService.prototype.authenticate = function (username, password, applicationId
     };
   };
 
-  var checkRolesForLoginRights = function checkRolesForLoginRights (applicationId) {
-    applicationId = applicationId || 'all';
-    var applicationLogin = applicationId + ':login';
+  var checkRolesForLoginRights = function checkRolesForLoginRights (_applicationId) {
+    _applicationId = _applicationId || 'all';
+    var applicationLogin = _applicationId + ':login';
     var allApplicationLogin = 'all:login';
     return function testForApplicationLogin (authenticationResponse) {
       var isApplicationLoginNotAllowed = authenticationResponse.roles.indexOf(applicationLogin) === -1;
-      var isAllApplicationLoginNotAllowed = authenticationResponse.roles.indexOf(allApplicationLogin) === -1
+      var isAllApplicationLoginNotAllowed = authenticationResponse.roles.indexOf(allApplicationLogin) === -1;
       if (isApplicationLoginNotAllowed && isAllApplicationLoginNotAllowed) {
-        throw getErrorWithCode('Unauthorised access: for application (' + applicationId + ').');
+        throw getErrorWithCode('Unauthorised access: for application (' + _applicationId + ').');
       }
 
-      authenticationResponse.applicationId = applicationId;
+      authenticationResponse.applicationId = _applicationId;
       return authenticationResponse;
     };
   };

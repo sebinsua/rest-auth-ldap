@@ -14,11 +14,15 @@ var fakeBunyanLogger = {
     return fakeBunyanLogger;
   },
   debug: function (/* arguments */) {
-      if (arguments.length === 0) return true;
+      if (arguments.length === 0) {
+        return true;
+      }
       debug.apply(debug, arguments);
   },
   trace: function (/* arguments */) {
-      if (arguments.length === 0) return true;
+      if (arguments.length === 0) {
+        return true;
+      }
       debug.apply(debug, arguments);
   }
 };
@@ -46,7 +50,7 @@ function LdapService (options) {
   var defaultOptions = {
     server: {
       url: '',
-      log: fakeBunyanLogger,
+      log: fakeBunyanLogger
     },
     base: '',
     search: {
@@ -89,15 +93,15 @@ LdapService.prototype.authenticate = function (username, password) {
       bindDn = self.options.uidTag + '=' + username + ',' + base;
     }
 
-    client.bind(bindDn, password, function (err) {
-      if (err) {
-        debug('(EE) [ldapjs] LDAP error:', err.stack);
+    client.bind(bindDn, password, function (bindErr) {
+      if (bindErr) {
+        debug('(EE) [ldapjs] LDAP error:', bindErr.stack);
         var errMessage, errCode;
-        if (err.code === 49) {
-          errMessage = 'Unauthorised access: ' + err.message;
+        if (bindErr.code === 49) {
+          errMessage = 'Unauthorised access: ' + bindErr.message;
           errCode = 'UNAUTHORIZED';
         } else {
-          errMessage = 'Connection error: ' + err.message;
+          errMessage = 'Connection error: ' + bindErr.message;
           errCode = 'NETWORK_ERROR';
         }
         return reject(getErrorWithCode(errMessage, errCode));
@@ -132,10 +136,10 @@ LdapService.prototype.authenticate = function (username, password) {
         // Replace placeholder name
         search.filter = search.filter.replace('$' + self.options.uidTag, username);
 
-        client.search(dn, search, function (err, res) {
-          if (err) {
-            debug('(EE) [ldapjs] LDAP error:', err.stack);
-            return reject(getErrorWithCode('Unauthorised access: ' + err.message, 'UNAUTHORIZED'));
+        client.search(dn, search, function (searchErr, res) {
+          if (searchErr) {
+            debug('(EE) [ldapjs] LDAP error:', searchErr.stack);
+            return reject(getErrorWithCode('Unauthorised access: ' + searchErr.message, 'UNAUTHORIZED'));
           }
 
           res.on('searchEntry', function (entry) {
@@ -143,9 +147,9 @@ LdapService.prototype.authenticate = function (username, password) {
             return resolve(profile);
           });
 
-          res.on('error', function (err) {
-            debug('(EE) [ldapjs] Network error:', err.stack);
-            return reject(getErrorWithCode(err.message, 'NETWORK_ERROR'));
+          res.on('error', function (resultErr) {
+            debug('(EE) [ldapjs] Network error:', resultErr.stack);
+            return reject(getErrorWithCode(resultErr.message, 'NETWORK_ERROR'));
           });
 
           res.on('end', function (result) {
