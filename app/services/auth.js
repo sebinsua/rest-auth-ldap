@@ -15,7 +15,7 @@ var path = require('path');
 
 var certificate;
 if (config.LDAP_CERTIFICATE_PATH) {
-  certificate = fs.readFileSync(path.resolve(__dirname, '/../../', config.LDAP_CERTIFICATE_PATH));
+  certificate = fs.readFileSync(path.resolve(__dirname, '../../', config.LDAP_CERTIFICATE_PATH));
 }
 
 var ldapUidTag = config.LDAP_UID_TAG || 'cn';
