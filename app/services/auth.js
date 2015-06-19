@@ -55,6 +55,7 @@ AuthService.prototype.authenticate = function (username, password, applicationId
 
       var authenticationResponse = {
         account: pickKeys(ldapAccount),
+        username: ldapAccount[ldapUidTag],
         roles: toRoles(objectClasses)
       };
 
@@ -95,7 +96,7 @@ AuthService.prototype.authenticate = function (username, password, applicationId
 
     var signedAuthenticationResponse = {
       authToken: authToken,
-      username: authenticationResponse.account[ldapUidTag],
+      username: authenticationResponse.username,
       roles: authenticationResponse.roles
     };
 
