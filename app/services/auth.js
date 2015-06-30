@@ -71,7 +71,7 @@ AuthService.prototype.authenticate = function (username, password, applicationId
       var isApplicationLoginNotAllowed = authenticationResponse.roles.indexOf(applicationLogin) === -1;
       var isAllApplicationLoginNotAllowed = authenticationResponse.roles.indexOf(allApplicationLogin) === -1;
       if (isApplicationLoginNotAllowed && isAllApplicationLoginNotAllowed) {
-        throw getErrorWithCode('Unauthorised access: for application (' + _applicationId + ').');
+        throw getErrorWithCode('Unauthorised access: User not allowed access for application (' + _applicationId + ').', 'UNAUTHORIZED');
       }
 
       authenticationResponse.applicationId = _applicationId;
@@ -120,7 +120,7 @@ AuthService.prototype.validate = function (authToken, applicationId) {
     return function checkPayloadApplicationId(payload) {
       var isNotForApplication = payload.applicationId && _applicationId !== payload.applicationId && payload.applicationId !== 'all';
       if (isNotForApplication) {
-        throw getErrorWithCode('Unauthorised access: for application (' + _applicationId + ').');
+        throw getErrorWithCode('Unauthorised access: user not allowed access for application (' + _applicationId + ').', 'UNAUTHORIZED');
       }
 
       return payload;
@@ -136,10 +136,7 @@ AuthService.prototype.validate = function (authToken, applicationId) {
 
   return verify(authToken, secret).
          then(isApplicationAllowed(applicationId)).
-         then(toAccount).
-         catch(function (err) {
-           throw getErrorWithCode('Unauthorised access: ' + err.message, 'UNAUTHORIZED');
-         });
+         then(toAccount);
 };
 
 module.exports = AuthService;
