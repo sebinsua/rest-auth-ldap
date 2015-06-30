@@ -116,19 +116,30 @@ AuthService.prototype.validate = function (authToken, applicationId) {
 
   var verify = Promise.promisify(jwt.verify.bind(jwt));
 
-  return verify(authToken, secret).then(function (payload) {
-    var isForApplication = payload.applicationId && applicationId !== payload.applicationId && payload.applicationId !== 'all';
-    if (isForApplication) {
-      throw getErrorWithCode('Unauthorised access: for application (' + applicationId + ').');
-    }
+  var isApplicationAllowed = function generateApplicationCheck(_applicationId) {
+    return function checkPayloadApplicationId(payload) {
+      var isNotForApplication = payload.applicationId && _applicationId !== payload.applicationId && payload.applicationId !== 'all';
+      if (isNotForApplication) {
+        throw getErrorWithCode('Unauthorised access: for application (' + _applicationId + ').');
+      }
 
+      return payload;
+    };
+  };
+
+  var toAccount = function payloadToAccount(payload) {
     return {
       username: payload.account.cn,
       roles: payload.roles
     };
-  }).catch(function (err) {
-    throw getErrorWithCode('Unauthorised access: ' + err.message, 'UNAUTHORIZED');
-  });
+  };
+
+  return verify(authToken, secret).
+         then(isApplicationAllowed(applicationId)).
+         then(toAccount).
+         catch(function (err) {
+           throw getErrorWithCode('Unauthorised access: ' + err.message, 'UNAUTHORIZED');
+         });
 };
 
 module.exports = AuthService;
