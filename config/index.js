@@ -6,7 +6,7 @@ var fs = require('fs'),
 
 var R = require('ramda');
 
-var CONFIG_PATH = '/etc/hmpo/rest-reporter-psn/config.json',
+var CONFIG_PATH = '/etc/rest-auth-ldap/config.json',
     defaultConfig = require('./default.json'),
     instanceConfig = fs.existsSync(CONFIG_PATH) ? require(CONFIG_PATH) : {},
     envConfig = R.pick(Object.keys(defaultConfig), process.env);

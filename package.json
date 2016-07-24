@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "description": "",
   "author": "Seb Insua <me@sebinsua.com>",
-  "license": "Commercial",
+  "license": "MIT",
   "private": true,
   "main": "app.js",
   "scripts": {
@@ -16,7 +16,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@git.commons.hmpo.net:hmpo-lsr/rest-auth-ldap.git"
+    "url": "git@github.com:sebinsua/rest-auth-ldap.git"
   },
   "engines": {
     "node": "0.10.x"

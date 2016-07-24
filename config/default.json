@@ -3,14 +3,14 @@
   "SERVICE_APP_LOG": "./app.log",
   "SERVICE_ERROR_LOG": "./error.log",
 
-  "LDAP_SERVER_URL": "ldaps://ldap.commons.hmpo.net",
-  "LDAP_CERTIFICATE_PATH": "./cert/ldap.commons.hmpo.net.pem",
-  "LDAP_BASE": "ou=Services,dc=hmpo,dc=net",
+  "LDAP_SERVER_URL": "ldaps://ldap.some-server.net",
+  "LDAP_CERTIFICATE_PATH": "./cert/some-certificate.pem",
+  "LDAP_BASE": "cn=users,dc=example,dc=local",
   "LDAP_UID_TAG": "cn",
   "LDAP_TIMEOUT": 15000,
 
-  "JWT_SHARED_SECRET": "hmpo-lsr:server-to-server-secret",
+  "JWT_SHARED_SECRET": "some-server-to-server-secret",
   "JWT_EXPIRY_MINUTES": 1440,
-  "JWT_AUDIENCE": "hmpo-lsr",
-  "JWT_ISSUER": "hmpo-auth-ldap"
+  "JWT_AUDIENCE": "some-audience",
+  "JWT_ISSUER": "some-issuer"
 }

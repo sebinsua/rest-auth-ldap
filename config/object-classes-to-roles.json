@@ -1,14 +1,15 @@
 {
   "person": [
-    "hmpo-lsr:frontend-examiner-psn:login"
+    "service:role",
+    "service:role-2"
   ],
   "admin": [
-    "hmpo-lsr:frontend-examiner-psn:login"
+    "service:role"
   ],
   "manager": [
-    "hmpo-lsr:frontend-examiner-psn:login"
+    "service:role"
   ],
   "examiner": [
-    "hmpo-lsr:frontend-examiner-psn:login"
+    "service:role"
   ]
 }
